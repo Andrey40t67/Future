@@ -144,21 +144,21 @@ export const Header = ({ onSearch, searchQuery, isDarkMode, onThemeToggle, user,
 };
 
 // Sidebar Component
-export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user }) => {
+export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user, onUpload }) => {
   const menuItems = [
-    { id: 'home', label: 'Home', icon: HomeIcon },
-    { id: 'trending', label: 'Trending', icon: FireIcon },
-    { id: 'subscriptions', label: 'Subscriptions', icon: BookmarkIcon },
-    { id: 'channel', label: 'Your Channel', icon: UserIcon },
+    { id: 'home', label: 'Главная', icon: HomeIcon },
+    { id: 'trending', label: 'В тренде', icon: FireIcon },
+    { id: 'subscriptions', label: 'Подписки', icon: BookmarkIcon },
+    { id: 'channel', label: 'Ваш канал', icon: UserIcon },
   ];
 
   const categories = [
-    { id: 'music', label: 'Music', icon: MusicalNoteIcon },
-    { id: 'gaming', label: 'Gaming', icon: RocketLaunchIcon },
-    { id: 'news', label: 'News', icon: NewspaperIcon },
-    { id: 'sports', label: 'Sports', icon: TvIcon },
-    { id: 'education', label: 'Education', icon: AcademicCapIcon },
-    { id: 'podcasts', label: 'Podcasts', icon: MicrophoneIcon },
+    { id: 'music', label: 'Музыка', icon: MusicalNoteIcon },
+    { id: 'gaming', label: 'Игры', icon: RocketLaunchIcon },
+    { id: 'news', label: 'Новости', icon: NewspaperIcon },
+    { id: 'sports', label: 'Спорт', icon: TvIcon },
+    { id: 'education', label: 'Обучение', icon: AcademicCapIcon },
+    { id: 'podcasts', label: 'Подкасты', icon: MicrophoneIcon },
   ];
 
   return (
@@ -178,9 +178,9 @@ export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user }) =
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 ${
+              className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 ${
                 currentView === item.id
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 shadow-md'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -190,18 +190,29 @@ export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user }) =
           ))}
         </div>
 
+        {/* Upload Button in Sidebar */}
+        {isOpen && user && (
+          <button
+            onClick={onUpload}
+            className="w-full mt-4 flex items-center space-x-3 px-3 py-3 rounded-lg bg-gradient-to-r from-green-500 to-blue-500 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+          >
+            <VideoCameraIcon className="w-6 h-6" />
+            <span>Создать видео</span>
+          </button>
+        )}
+
         {isOpen && (
           <>
             <div className="mt-8 mb-4">
               <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3">
-                Explore
+                Изучайте
               </h3>
             </div>
             <div className="space-y-2">
               {categories.map((category) => (
                 <button
                   key={category.id}
-                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105"
                 >
                   <category.icon className="w-5 h-5" />
                   <span>{category.label}</span>
@@ -209,13 +220,13 @@ export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user }) =
               ))}
             </div>
 
-            <div className="mt-8 p-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
+            <div className="mt-8 p-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">StreamSphere Premium</h4>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                Unlock exclusive features and ad-free experience
+                Разблокируйте эксклюзивные функции и опыт без рекламы
               </p>
-              <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:shadow-lg transition-all duration-200">
-                Upgrade Now
+              <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+                Обновить сейчас
               </button>
             </div>
           </>
