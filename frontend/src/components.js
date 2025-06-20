@@ -995,3 +995,53 @@ export const AdvancedFilter = () => null;
 export const HoverPreview = () => null;
 export const PlaylistManager = () => null;
 export const VideoRecommendations = () => null;
+
+// Simple modal for uploading videos (demo placeholder)
+export const VideoUpload = ({ isOpen, onClose, user }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Загрузка видео</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-4">
+          Функция загрузки видео не реализована в демо версии.
+        </p>
+        <button
+          onClick={onClose}
+          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Button to trigger Google authentication
+export const GoogleAuthButton = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700"
+  >
+    Войти через Google
+  </button>
+);
+
+// Authentication modal wrapper
+export const AuthModal = ({ isOpen, onClose, onGoogleSignIn }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-80">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Вход</h2>
+        <GoogleAuthButton onClick={onGoogleSignIn} />
+        <button
+          onClick={onClose}
+          className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  );
+};
