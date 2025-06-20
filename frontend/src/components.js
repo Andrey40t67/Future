@@ -32,8 +32,10 @@ import {
   MusicalNoteIcon,
   AcademicCapIcon,
   NewspaperIcon,
-  GamepadIcon,
-  MicrophoneIcon
+  RocketLaunchIcon,
+  MicrophoneIcon,
+  ArrowUpTrayIcon,
+  DocumentArrowUpIcon
 } from '@heroicons/react/24/outline';
 import { 
   PlayIcon as PlayIconSolid,
