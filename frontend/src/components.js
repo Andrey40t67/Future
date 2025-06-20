@@ -109,12 +109,12 @@ export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user }) =
   ];
 
   const categories = [
-    { id: 'music', label: 'Music', icon: MusicalNoteIcon || StarIcon },
-    { id: 'gaming', label: 'Gaming', icon: PlayIcon },
-    { id: 'news', label: 'News', icon: NewspaperIcon || ClockIcon },
-    { id: 'sports', label: 'Sports', icon: TvIcon || EyeIcon },
-    { id: 'education', label: 'Education', icon: AcademicCapIcon || BookmarkIcon },
-    { id: 'podcasts', label: 'Podcasts', icon: MicrophoneIcon || SpeakerWaveIcon },
+    { id: 'music', label: 'Music', icon: MusicalNoteIcon },
+    { id: 'gaming', label: 'Gaming', icon: RocketLaunchIcon },
+    { id: 'news', label: 'News', icon: NewspaperIcon },
+    { id: 'sports', label: 'Sports', icon: TvIcon },
+    { id: 'education', label: 'Education', icon: AcademicCapIcon },
+    { id: 'podcasts', label: 'Podcasts', icon: MicrophoneIcon },
   ];
 
   return (
