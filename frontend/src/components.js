@@ -50,9 +50,10 @@ import {
 } from '@heroicons/react/24/solid';
 
 // Header Component
-export const Header = ({ onSearch, searchQuery, isDarkMode, onThemeToggle, user }) => {
+export const Header = ({ onSearch, searchQuery, isDarkMode, onThemeToggle, user, onSignOut, onShowAuth, onUpload }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [notifications, setNotifications] = useState(3);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
@@ -60,29 +61,29 @@ export const Header = ({ onSearch, searchQuery, isDarkMode, onThemeToggle, user 
         {/* Logo */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-xl">S</span>
             </div>
             <div className="ml-3">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
                 StreamSphere
               </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">by AndreyVV</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">от AndreyVV</p>
             </div>
           </div>
         </div>
 
         {/* Search Bar */}
         <div className="flex-1 max-w-2xl mx-8">
-          <div className={`relative transition-all duration-300 ${isSearchFocused ? 'transform scale-105' : ''}`}>
+          <div className={`relative transition-all duration-300 ${isSearchFocused ? 'transform scale-105 shadow-lg' : ''}`}>
             <input
               type="text"
-              placeholder="Search videos, creators, or topics..."
+              placeholder="Поиск видео, создателей или тем..."
               value={searchQuery}
               onChange={(e) => onSearch(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className="w-full px-4 py-3 pl-12 pr-4 rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-all duration-300"
+              className="w-full px-4 py-3 pl-12 pr-4 rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-all duration-300 placeholder-gray-500 dark:placeholder-gray-400"
             />
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           </div>
@@ -90,9 +91,52 @@ export const Header = ({ onSearch, searchQuery, isDarkMode, onThemeToggle, user 
 
         {/* User Controls */}
         <div className="flex items-center space-x-4">
+          {/* Upload Button */}
+          <button
+            onClick={onUpload}
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+          >
+            <ArrowUpTrayIcon className="w-5 h-5" />
+            <span className="hidden sm:inline">Загрузить</span>
+          </button>
+
           <ThemeToggle isDarkMode={isDarkMode} onToggle={onThemeToggle} />
           <NotificationBell count={notifications} />
-          <UserProfile user={user} />
+          
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <img 
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full object-cover border-2 border-blue-500"
+                />
+                <span className="font-medium text-gray-900 dark:text-white hidden sm:inline">
+                  {user.name}
+                </span>
+              </button>
+              
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={onSignOut}
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    Выйти
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <GoogleAuthButton onClick={onShowAuth} />
+          )}
         </div>
       </div>
     </header>
