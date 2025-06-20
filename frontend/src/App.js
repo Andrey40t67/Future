@@ -19,7 +19,9 @@ import {
   StarIcon,
   CheckBadgeIcon,
   SunIcon,
-  MoonIcon
+  MoonIcon,
+  ArrowUpTrayIcon,
+  VideoCameraIcon
 } from '@heroicons/react/24/outline';
 import { 
   PlayIcon as PlayIconSolid,
@@ -30,6 +32,10 @@ import {
   BookmarkIcon as BookmarkIconSolid,
   StarIcon as StarIconSolid
 } from '@heroicons/react/24/solid';
+
+// Import Firebase auth
+import { auth, googleProvider } from './firebase';
+import { signInWithPopup, signOut } from 'firebase/auth';
 
 // Import all components
 import { 
@@ -60,7 +66,10 @@ import {
   ThemeToggle,
   HoverPreview,
   CreatorMonetization,
-  VideoRecommendations
+  VideoRecommendations,
+  VideoUpload,
+  GoogleAuthButton,
+  AuthModal
 } from './components';
 
 // Mock data for videos
@@ -73,7 +82,7 @@ const MOCK_VIDEOS = [
     views: "2.5M",
     uploadTime: "2 days ago",
     duration: "12:45",
-    description: "Exploring the revolutionary changes in content creation landscape...",
+    description: "Exploring the revolutionary changes in content creation landscape. This comprehensive guide covers the latest trends, tools, and technologies that are shaping the future of digital content.",
     category: "Technology",
     tags: ["tech", "future", "content", "creation"],
     likes: 45000,
@@ -91,7 +100,7 @@ const MOCK_VIDEOS = [
     views: "850K",
     uploadTime: "5 days ago",
     duration: "8:30",
-    description: "Take a tour of our revolutionary streaming setup...",
+    description: "Take a tour of our revolutionary streaming setup. Learn professional tips for creating engaging content that captivates your audience.",
     category: "Entertainment",
     tags: ["studio", "setup", "production"],
     likes: 28000,
@@ -109,7 +118,7 @@ const MOCK_VIDEOS = [
     views: "125K",
     uploadTime: "Live now",
     duration: "LIVE",
-    description: "Live showcase of breakthrough technologies...",
+    description: "Live showcase of breakthrough technologies that will change the world. Interactive session with Q&A.",
     category: "Live",
     tags: ["live", "innovation", "technology"],
     likes: 12000,
@@ -127,7 +136,7 @@ const MOCK_VIDEOS = [
     views: "1.2M",
     uploadTime: "1 week ago",
     duration: "15:20",
-    description: "Immersive digital art performance experience...",
+    description: "Immersive digital art performance experience combining technology and creativity in unprecedented ways.",
     category: "Art",
     tags: ["digital", "art", "performance"],
     likes: 35000,
@@ -145,7 +154,7 @@ const MOCK_VIDEOS = [
     views: "650K",
     uploadTime: "3 days ago",
     duration: "20:15",
-    description: "Deep dive into the creative process behind viral content...",
+    description: "Deep dive into the creative process behind viral content. Exclusive insights from industry professionals.",
     category: "Education",
     tags: ["creative", "process", "education"],
     likes: 22000,
@@ -163,7 +172,7 @@ const MOCK_VIDEOS = [
     views: "450K",
     uploadTime: "1 day ago",
     duration: "18:45",
-    description: "Interactive demonstration of cutting-edge technology...",
+    description: "Interactive demonstration of cutting-edge technology. See the future of digital innovation unfold.",
     category: "Technology",
     tags: ["tech", "demo", "interactive"],
     likes: 18000,
@@ -175,12 +184,12 @@ const MOCK_VIDEOS = [
   }
 ];
 
-// Mock creators data
+// Mock creators data with better avatars
 const MOCK_CREATORS = [
   {
     id: 1,
     name: "TechVisionary",
-    avatar: "https://images.pexels.com/photos/11158021/pexels-photo-11158021.jpeg",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     subscribers: "2.8M",
     verified: true,
     category: "Technology",
@@ -191,7 +200,7 @@ const MOCK_CREATORS = [
   {
     id: 2,
     name: "StudioMaster",
-    avatar: "https://images.unsplash.com/photo-1637607698942-558b19148d82?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHxjb250ZW50JTIwY3JlYXRvcnN8ZW58MHx8fGJsdWV8MTc1MDQ0MjE2N3ww&ixlib=rb-4.1.0&q=85",
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616b332c7bc?w=150&h=150&fit=crop&crop=face",
     subscribers: "1.5M",
     verified: true,
     category: "Entertainment",
@@ -202,7 +211,7 @@ const MOCK_CREATORS = [
   {
     id: 3,
     name: "InnovationLab",
-    avatar: "https://images.unsplash.com/photo-1645588799116-4f416bf28902?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxkaWdpdGFsJTIwZW50ZXJ0YWlubWVudHxlbnwwfHx8Ymx1ZXwxNzUwNDQyMTc1fDA&ixlib=rb-4.1.0&q=85",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
     subscribers: "3.2M",
     verified: true,
     category: "Science",
@@ -213,7 +222,7 @@ const MOCK_CREATORS = [
   {
     id: 4,
     name: "DigitalArtist",
-    avatar: "https://images.pexels.com/photos/5475744/pexels-photo-5475744.jpeg",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     subscribers: "950K",
     verified: false,
     category: "Art",
@@ -242,12 +251,47 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [user, setUser] = useState({
-    name: "AndreyVV",
-    avatar: "https://images.pexels.com/photos/11158021/pexels-photo-11158021.jpeg",
-    subscriptions: 45,
-    playlists: 12
-  });
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // Firebase auth state listener
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        setUser({
+          name: authUser.displayName || "User",
+          email: authUser.email,
+          avatar: authUser.photoURL || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          subscriptions: 45,
+          playlists: 12
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Google Sign In
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      setShowAuthModal(false);
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+    }
+  };
+
+  // Sign Out
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   const filteredVideos = MOCK_VIDEOS.filter(video => {
     const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -275,6 +319,14 @@ function App() {
     setCurrentView('search');
   };
 
+  const handleUpload = () => {
+    if (user) {
+      setShowUploadModal(true);
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'video':
@@ -283,7 +335,7 @@ function App() {
             <div className="lg:w-2/3">
               <VideoPlayer video={selectedVideo} />
               <VideoDetails video={selectedVideo} />
-              <CommentSection videoId={selectedVideo?.id} />
+              <CommentSection videoId={selectedVideo?.id} user={user} />
             </div>
             <div className="lg:w-1/3">
               <Recommendations videos={MOCK_VIDEOS.filter(v => v.id !== selectedVideo?.id)} />
@@ -302,17 +354,23 @@ function App() {
         return (
           <div className="space-y-8">
             {/* Hero Section */}
-            <div className="relative h-96 rounded-xl overflow-hidden">
+            <div className="relative h-96 rounded-xl overflow-hidden shadow-2xl">
               <img 
                 src="https://images.pexels.com/photos/8254894/pexels-photo-8254894.jpeg" 
                 alt="StreamSphere Hero" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-purple-900/80 flex items-center">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-purple-900/90 flex items-center">
                 <div className="px-8 text-white">
-                  <h1 className="text-5xl font-bold mb-4">Welcome to StreamSphere</h1>
-                  <p className="text-xl mb-6">The Revolutionary Video Platform Created by AndreyVV</p>
-                  <p className="text-lg opacity-90">Experience the future of content creation and discovery</p>
+                  <h1 className="text-6xl font-bold mb-4 animate-fadeInUp">
+                    Добро пожаловать в StreamSphere
+                  </h1>
+                  <p className="text-xl mb-6 animate-fadeInUp delay-200">
+                    Революционная видеоплатформа, созданная AndreyVV
+                  </p>
+                  <p className="text-lg opacity-90 animate-fadeInUp delay-400">
+                    Испытайте будущее создания и открытия контента
+                  </p>
                 </div>
               </div>
             </div>
@@ -329,7 +387,9 @@ function App() {
 
             {/* Top Creators */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-6">Featured Creators</h2>
+              <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+                Рекомендуемые создатели
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {MOCK_CREATORS.map(creator => (
                   <CreatorCard key={creator.id} creator={creator} />
@@ -342,7 +402,7 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen transition-all duration-300 ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
       <div className="flex">
         <Sidebar 
           isOpen={sidebarOpen}
@@ -350,6 +410,7 @@ function App() {
           currentView={currentView}
           onViewChange={setCurrentView}
           user={user}
+          onUpload={handleUpload}
         />
         
         <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
@@ -359,6 +420,9 @@ function App() {
             isDarkMode={isDarkMode}
             onThemeToggle={toggleTheme}
             user={user}
+            onSignOut={handleSignOut}
+            onShowAuth={() => setShowAuthModal(true)}
+            onUpload={handleUpload}
           />
           
           <main className="p-6">
@@ -368,6 +432,24 @@ function App() {
           <Footer />
         </div>
       </div>
+      
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <VideoUpload 
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          user={user}
+        />
+      )}
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onGoogleSignIn={handleGoogleSignIn}
+        />
+      )}
       
       {/* Loading states and animations */}
       <LoadingSpinner />
