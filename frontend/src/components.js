@@ -110,7 +110,7 @@ export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user }) =
 
   const categories = [
     { id: 'music', label: 'Music', icon: MusicalNoteIcon || StarIcon },
-    { id: 'gaming', label: 'Gaming', icon: GamepadIcon || PlayIcon },
+    { id: 'gaming', label: 'Gaming', icon: PlayIcon },
     { id: 'news', label: 'News', icon: NewspaperIcon || ClockIcon },
     { id: 'sports', label: 'Sports', icon: TvIcon || EyeIcon },
     { id: 'education', label: 'Education', icon: AcademicCapIcon || BookmarkIcon },
