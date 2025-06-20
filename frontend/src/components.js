@@ -236,24 +236,37 @@ export const Sidebar = ({ isOpen, onToggle, currentView, onViewChange, user, onU
   );
 };
 
-// Video Card Component
+// Video Card Component with improved avatars
 export const VideoCard = ({ video, onVideoClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
+  // Better avatar mapping
+  const getCreatorAvatar = (creator) => {
+    const avatarMap = {
+      'TechVisionary': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      'StudioMaster': 'https://images.unsplash.com/photo-1494790108755-2616b332c7bc?w=150&h=150&fit=crop&crop=face',
+      'InnovationLab': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      'DigitalArtist': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+      'CreativeGenius': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+      'TechExplorer': 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face'
+    };
+    return avatarMap[creator] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+  };
+
   return (
     <div 
-      className="group cursor-pointer"
+      className="group cursor-pointer video-card rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onVideoClick(video)}
     >
-      <div className="relative mb-3 rounded-xl overflow-hidden">
+      <div className="relative">
         <InteractiveThumbnail video={video} isHovered={isHovered} />
         
         {/* Duration */}
-        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
           {video.duration}
         </div>
         
@@ -267,7 +280,7 @@ export const VideoCard = ({ video, onVideoClick }) => {
               e.stopPropagation();
               setIsLiked(!isLiked);
             }}
-            className="p-2 bg-black/70 rounded-full hover:bg-black/90 transition-colors"
+            className="p-2 bg-black/70 rounded-full hover:bg-black/90 transition-colors backdrop-blur-sm"
           >
             {isLiked ? (
               <HeartIconSolid className="w-4 h-4 text-red-500" />
@@ -280,7 +293,7 @@ export const VideoCard = ({ video, onVideoClick }) => {
               e.stopPropagation();
               setIsBookmarked(!isBookmarked);
             }}
-            className="p-2 bg-black/70 rounded-full hover:bg-black/90 transition-colors"
+            className="p-2 bg-black/70 rounded-full hover:bg-black/90 transition-colors backdrop-blur-sm"
           >
             {isBookmarked ? (
               <BookmarkIconSolid className="w-4 h-4 text-blue-500" />
@@ -291,33 +304,38 @@ export const VideoCard = ({ video, onVideoClick }) => {
         </div>
       </div>
       
-      <div className="flex space-x-3">
-        <img 
-          src={video.creator === 'TechVisionary' ? 'https://images.pexels.com/photos/11158021/pexels-photo-11158021.jpeg' : 
-               video.creator === 'StudioMaster' ? 'https://images.unsplash.com/photo-1637607698942-558b19148d82?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHxjb250ZW50JTIwY3JlYXRvcnN8ZW58MHx8fGJsdWV8MTc1MDQ0MjE2N3ww&ixlib=rb-4.1.0&q=85' :
-               video.creator === 'InnovationLab' ? 'https://images.unsplash.com/photo-1645588799116-4f416bf28902?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxkaWdpdGFsJTIwZW50ZXJ0YWlubWVudHxlbnwwfHx8Ymx1ZXwxNzUwNDQyMTc1fDA&ixlib=rb-4.1.0&q=85' :
-               'https://images.pexels.com/photos/5475744/pexels-photo-5475744.jpeg'}
-          alt={video.creator}
-          className="w-10 h-10 rounded-full object-cover"
-        />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            {video.title}
-          </h3>
-          <div className="flex items-center space-x-1 mt-1">
-            <p className="text-sm text-gray-600 dark:text-gray-400">{video.creator}</p>
-            {video.verified && <CreatorBadge />}
-          </div>
-          <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
-            <span>{video.views} views</span>
-            <span>•</span>
-            <span>{video.uploadTime}</span>
-            {video.premium && (
-              <>
-                <span>•</span>
-                <StarIconSolid className="w-3 h-3 text-yellow-500" />
-              </>
-            )}
+      <div className="p-4">
+        <div className="flex space-x-3">
+          <img 
+            src={getCreatorAvatar(video.creator)}
+            alt={video.creator}
+            className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 shadow-sm"
+            onError={(e) => {
+              e.target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+            }}
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-1">
+              {video.title}
+            </h3>
+            <div className="flex items-center space-x-1 mb-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400">{video.creator}</p>
+              {video.verified && <CreatorBadge />}
+            </div>
+            <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
+              <span>{video.views} просмотров</span>
+              <span>•</span>
+              <span>{video.uploadTime}</span>
+              {video.premium && (
+                <>
+                  <span>•</span>
+                  <div className="flex items-center space-x-1">
+                    <StarIconSolid className="w-3 h-3 text-yellow-500" />
+                    <span className="text-yellow-600 dark:text-yellow-400 font-medium">Premium</span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
